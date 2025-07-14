@@ -89,6 +89,19 @@ const getDadJoke = server.tool(
   }
 );
 
+// Get secret phrase tool
+// Add an addition tool
+server.registerTool("add",
+  {
+    title: "Addition Tool",
+    description: "Add two numbers",
+    inputSchema: { a: z.number(), b: z.number() }
+  },
+  async ({ a, b }) => ({
+    content: [{ type: "text", text: `The sum of the numbers is: ${String(a + b)}.` }]
+  })
+);
+
 const app = express();
 app.use(express.json());
 
