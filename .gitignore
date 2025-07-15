@@ -26,4 +26,5 @@ logs/
 .ntvs_analysis.dat
 node_modules/
 
-#
+# Python
+venv/
