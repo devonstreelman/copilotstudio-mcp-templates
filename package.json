@@ -2,18 +2,18 @@
   "name": "mcp-streamable-http",
   "private": true,
   "version": "1.0.0",
-  "main": "src/server.js",
+  "main": "src-js/server.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node src-js/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
     "build"
   ],
   "bin": {
-    "demo": "./dist/server.js"
+    "demo": "./src-js/server.js"
   },
   "keywords": [],
   "author": "",
