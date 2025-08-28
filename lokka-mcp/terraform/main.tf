@@ -43,12 +43,83 @@ resource "azurerm_container_app_environment" "lokka_mcp" {
   log_analytics_workspace_id = azurerm_log_analytics_workspace.lokka_mcp.id
 }
 
+# Data source to get current client configuration
+data "azurerm_client_config" "current" {}
+
+# Azure Key Vault
+resource "azurerm_key_vault" "lokka_mcp" {
+  name                        = var.key_vault_name
+  location                    = azurerm_resource_group.lokka_mcp.location
+  resource_group_name         = azurerm_resource_group.lokka_mcp.name
+  enabled_for_disk_encryption = true
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "Get",
+    ]
+
+    secret_permissions = [
+      "Get",
+      "Set",
+      "Delete",
+      "Purge",
+      "Recover"
+    ]
+
+    storage_permissions = [
+      "Get",
+    ]
+  }
+}
+
+# Key Vault Access Policy for Container App
+resource "azurerm_key_vault_access_policy" "container_app_policy" {
+  key_vault_id = azurerm_key_vault.lokka_mcp.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_container_app.lokka_mcp.identity[0].principal_id
+
+  secret_permissions = [
+    "Get"
+  ]
+}
+
+# Key Vault Secrets
+resource "azurerm_key_vault_secret" "tenant_id" {
+  name         = "tenant-id"
+  value        = var.tenant_id
+  key_vault_id = azurerm_key_vault.lokka_mcp.id
+}
+
+resource "azurerm_key_vault_secret" "client_id" {
+  name         = "client-id"
+  value        = var.client_id
+  key_vault_id = azurerm_key_vault.lokka_mcp.id
+}
+
+resource "azurerm_key_vault_secret" "client_secret" {
+  name         = "client-secret"
+  value        = var.client_secret
+  key_vault_id = azurerm_key_vault.lokka_mcp.id
+}
+
 # Container App
 resource "azurerm_container_app" "lokka_mcp" {
   name                         = "${var.prefix}-server"
   container_app_environment_id = azurerm_container_app_environment.lokka_mcp.id
   resource_group_name          = azurerm_resource_group.lokka_mcp.name
   revision_mode                = "Single"
+
+  identity {
+    type = "SystemAssigned"
+  }
 
   registry {
     server               = azurerm_container_registry.lokka_mcp.login_server
@@ -62,24 +133,27 @@ resource "azurerm_container_app" "lokka_mcp" {
   }
 
   secret {
-    name  = "tenant-id"
-    value = var.tenant_id
+    name          = "tenant-id"
+    key_vault_url = azurerm_key_vault_secret.tenant_id.versionless_id
+    identity      = "system"
   }
 
   secret {
-    name  = "client-id"
-    value = var.client_id
+    name          = "client-id"
+    key_vault_url = azurerm_key_vault_secret.client_id.versionless_id
+    identity      = "system"
   }
 
   secret {
-    name  = "client-secret"
-    value = var.client_secret
+    name          = "client-secret"
+    key_vault_url = azurerm_key_vault_secret.client_secret.versionless_id
+    identity      = "system"
   }
 
   template {
     container {
       name   = "${var.prefix}-server"
-      image  = "${azurerm_container_registry.lokka_mcp.login_server}/${var.image_name}:${var.image_tag}"
+      image  = "${azurerm_container_registry.lokka_mcp.login_server}/${var.image_name}:${var.image_tag}-amd64"
       cpu    = 0.5
       memory = "1Gi"
 
@@ -115,7 +189,7 @@ resource "azurerm_container_app" "lokka_mcp" {
 
       env {
         name  = "PORT"
-        value = "3000"
+        value = "5811"
       }
     }
 
@@ -126,7 +200,7 @@ resource "azurerm_container_app" "lokka_mcp" {
   ingress {
     allow_insecure_connections = false
     external_enabled          = true
-    target_port               = 3000
+    target_port               = 5811
 
     traffic_weight {
       percentage      = 100

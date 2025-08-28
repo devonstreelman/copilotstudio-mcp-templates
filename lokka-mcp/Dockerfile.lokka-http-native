@@ -23,7 +23,7 @@ RUN npm install
 # Replace STDIO transport with HTTP transport in main.ts
 RUN sed -i 's/import { StdioServerTransport } from "@modelcontextprotocol\/sdk\/server\/stdio.js";/import { StreamableHTTPServerTransport } from "@modelcontextprotocol\/sdk\/server\/streamableHttp.js";\nimport express from "express";/' src/main.ts && \
     sed -i 's/const transport = new StdioServerTransport();/\/\/ Create Express app\n  const app = express();\n  app.use(express.json());\n\n  \/\/ Create HTTP transport\n  const transport = new StreamableHTTPServerTransport({\n    sessionIdGenerator: undefined \/\/ stateless for Copilot Studio\n  });/' src/main.ts && \
-    sed -i 's/await server.connect(transport);/await server.connect(transport);\n\n  \/\/ Setup HTTP routes\n  app.post("\/mcp", async (req, res) => {\n    console.log("Received MCP request:", req.body);\n    try {\n      await transport.handleRequest(req, res, req.body);\n    } catch (error) {\n      console.error("Error handling MCP request:", error);\n      if (!res.headersSent) {\n        res.status(500).json({\n          jsonrpc: "2.0",\n          error: {\n            code: -32603,\n            message: "Internal server error",\n          },\n          id: null,\n        });\n      }\n    }\n  });\n\n  \/\/ Health check endpoint\n  app.get("\/health", (req, res) => {\n    res.json({\n      status: "healthy",\n      service: "lokka-mcp-http",\n      timestamp: new Date().toISOString()\n    });\n  });\n\n  \/\/ Start HTTP server\n  const PORT = process.env.PORT || 3000;\n  app.listen(PORT, () => {\n    console.log(\`Lokka MCP HTTP Server listening on port \${PORT}\`);\n  });/' src/main.ts
+    sed -i 's/await server.connect(transport);/await server.connect(transport);\n\n  \/\/ Setup HTTP routes\n  app.post("\/mcp", async (req, res) => {\n    console.log("Received MCP request:", req.body);\n    try {\n      await transport.handleRequest(req, res, req.body);\n    } catch (error) {\n      console.error("Error handling MCP request:", error);\n      if (!res.headersSent) {\n        res.status(500).json({\n          jsonrpc: "2.0",\n          error: {\n            code: -32603,\n            message: "Internal server error",\n          },\n          id: null,\n        });\n      }\n    }\n  });\n\n  \/\/ Health check endpoint\n  app.get("\/health", (req, res) => {\n    res.json({\n      status: "healthy",\n      service: "lokka-mcp-http",\n      timestamp: new Date().toISOString()\n    });\n  });\n\n  \/\/ Start HTTP server\n  const PORT = process.env.PORT || 5811;\n  app.listen(PORT, () => {\n    console.log(\`Lokka MCP HTTP Server listening on port \${PORT}\`);\n  });/' src/main.ts
 
 # Build the project
 RUN npm run build
@@ -36,14 +36,14 @@ RUN mkdir -p /root/.local/share && \
 # Set environment variables
 ENV HOME=/root
 ENV TMPDIR=/tmp
-ENV PORT=3000
+ENV PORT=5811
 
 # Expose the port
-EXPOSE 3000
+EXPOSE 5811
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5811/health || exit 1
 
 # Start Lokka HTTP server
 CMD ["npm", "start"]

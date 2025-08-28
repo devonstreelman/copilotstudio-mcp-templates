@@ -719,7 +719,7 @@ async function main() {
   });
 
   // Start HTTP server
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 5811;
   app.listen(PORT, () => {
     console.log(`Lokka MCP HTTP Server listening on port ${PORT}`);
   });

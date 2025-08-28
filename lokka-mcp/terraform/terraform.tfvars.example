@@ -1,26 +1,24 @@
-# Copy this file to terraform.tfvars and fill in your values
+# Copy this file to terraform.tfvars and update the values below
 
-# Azure region to deploy resources
-location = "West US 3"
+# Azure Resource Configuration
+resource_group_name = "UPDATE_RESOURCE_GROUP_NAME"  # e.g., "Devon_Streelman_test"
+location           = "UPDATE_AZURE_REGION"         # e.g., "West US 3"
+prefix            = "UPDATE_RESOURCE_PREFIX"       # e.g., "cg-lokka-mcp"
 
-# Prefix for all resource names
-prefix = "lokka-mcp"
+# Container Registry (must be globally unique)
+registry_name = "UPDATE_REGISTRY_NAME"             # e.g., "cglokkareg"
 
-# Resource group name
-resource_group_name = "lokka-mcp-rg"
+# Key Vault (must be globally unique)
+key_vault_name = "UPDATE_KEY_VAULT_NAME"           # e.g., "cg-lokka-kv"
 
-# Container registry name (must be globally unique)
-registry_name = "lokkamcpreg12345"
-
-# Azure AD credentials for Microsoft Graph access
-tenant_id     = "your-tenant-id-here"
-client_id     = "your-client-id-here"
-client_secret = "your-client-secret-here"
-
-# Whether to create a new Azure AD app registration
-# Set to true if you want Terraform to create the app registration
-create_app_registration = false
-
-# Container image settings
+# Container Image Configuration
 image_name = "lokka-mcp"
-image_tag  = "http-native"
+image_tag  = "http-clean"
+
+# Azure AD Authentication
+tenant_id     = "UPDATE_TENANT_ID"                 # Your Azure AD tenant ID
+client_id     = "UPDATE_CLIENT_ID"                 # Your app registration client ID
+client_secret = "UPDATE_CLIENT_SECRET"             # Your app registration client secret
+
+# Optional: Create new app registration (set to true if you need Terraform to create the app)
+create_app_registration = false
