@@ -28,3 +28,19 @@ node_modules/
 
 # Python
 venv/
+lokka-mcp/test.env
+
+# Additional env patterns
+# Ignore common env files across the repo
+.env
+.env.*
+*.env
+*.env.*
+
+# But keep tracked examples/templates
+!.env.example
+!*.env.example
+!.env.template
+!*.env.template
+!.env.sample
+!*.env.sample

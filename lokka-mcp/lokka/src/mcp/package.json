@@ -1,0 +1,56 @@
+{
+  "name": "@merill/lokka",
+  "version": "0.3.0",
+  "description": "Lokka is a Model Context Protocol (MCP) server for Microsoft Graph.",
+  "license": "MIT",
+  "author": "Merill",
+  "homepage": "https://lokka.dev",
+  "bugs": "https://github.com/merill/lokka/issues",
+  "main": "main.js",
+  "type": "module",
+  "keywords": [
+    "mcp",
+    "graph",
+    "microsoft",
+    "graph",
+    "model",
+    "context",
+    "protocol"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merill/lokka.git",
+    "directory": "src/mcp"
+  },
+  "bin": {
+    "lokka": "build/main.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:unix": "tsc && chmod 755 build/main.js",
+    "demo:token": "node build/demo-token-auth.js",
+    "test:token": "node build/test-token-auth.js",
+    "test:simple": "node build/simple-token-test.js",
+    "test:live": "node build/live-test.js",
+    "start": "node build/main.js"
+  },
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "@azure/identity": "^4.3.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@modelcontextprotocol/sdk": "^1.15.1",
+    "@types/jsonwebtoken": "^9.0.10",
+    "express": "^4.18.2",
+    "isomorphic-fetch": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/isomorphic-fetch": "^0.0.39",
+    "@types/node": "^22.13.17",
+    "typescript": "^5.8.2"
+  }
+}

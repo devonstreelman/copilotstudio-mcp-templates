@@ -1,0 +1,26 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+# Azure region to deploy resources
+location = "West US 3"
+
+# Prefix for all resource names
+prefix = "lokka-mcp"
+
+# Resource group name
+resource_group_name = "lokka-mcp-rg"
+
+# Container registry name (must be globally unique)
+registry_name = "lokkamcpreg12345"
+
+# Azure AD credentials for Microsoft Graph access
+tenant_id     = "your-tenant-id-here"
+client_id     = "your-client-id-here"
+client_secret = "your-client-secret-here"
+
+# Whether to create a new Azure AD app registration
+# Set to true if you want Terraform to create the app registration
+create_app_registration = false
+
+# Container image settings
+image_name = "lokka-mcp"
+image_tag  = "http-native"

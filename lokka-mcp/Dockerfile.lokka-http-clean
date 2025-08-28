@@ -1,0 +1,33 @@
+FROM node:20-alpine
+
+# Install git and wget for health checks
+RUN apk add --no-cache git wget
+
+# Set working directory
+WORKDIR /app
+
+# Copy our modified Lokka source
+COPY lokka/src/mcp/ .
+
+# Install dependencies and build
+RUN npm install && npm run build
+
+# Create necessary directories
+RUN mkdir -p /root/.local/share && \
+    mkdir -p /root/.config && \
+    mkdir -p /root/.cache
+
+# Set environment variables
+ENV HOME=/root
+ENV TMPDIR=/tmp
+ENV PORT=3000
+
+# Expose the port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Start Lokka HTTP server
+CMD ["npm", "start"]
